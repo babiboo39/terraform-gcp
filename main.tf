@@ -3,7 +3,7 @@ resource "google_compute_instance" "learn_vm" {
     machine_type    = var.machine_type
     # region          = var.region
     zone            = var.zone
-    tags            = ["ssh-allow"]
+    tags            = ["ssh-allow", "http-allow"]
 
     boot_disk {
         initialize_params {
@@ -34,4 +34,15 @@ resource "google_compute_firewall" "ssh-rule" {
     }
     target_tags   = ["ssh-allow"]
     source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_firewall" "http-rule" {
+    name    = "http-access"
+    network = "default"
+    allow {
+        protocol = "tcp"
+        ports    = ["80", "443"]
+    }
+    target_tags   = ["http-allow"]
+    source_ranges = ["0.0.0.0/0"] 
 }
