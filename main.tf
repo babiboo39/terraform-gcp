@@ -1,7 +1,6 @@
 resource "google_compute_instance" "learn_vm" {
     name            = var.name
     machine_type    = var.machine_type
-    # region          = var.region
     zone            = var.zone
     tags            = ["ssh-allow", "http-allow"]
 
@@ -14,20 +13,20 @@ resource "google_compute_instance" "learn_vm" {
       sshKeys = "rulikalit:${file("~/.ssh/id_rsa.pub")}"
     }
     network_interface {
-        network = "default"
+        network = google_compute_network.vpc_network.name
         access_config {
         }
     }
 
 }
 
-# resource "google_compute_network" "vpc_network" {
-#     name = "terraform-net"
-#}
+resource "google_compute_network" "vpc_network" {
+    name = "terraform-net"
+}
 
 resource "google_compute_firewall" "ssh-rule" {
     name    = "demo-ssh"
-    network = "default"
+    network = google_compute_network.vpc_network.name
     allow {
         protocol = "tcp"
         ports    = ["22"]
@@ -38,7 +37,7 @@ resource "google_compute_firewall" "ssh-rule" {
 
 resource "google_compute_firewall" "http-rule" {
     name    = "http-access"
-    network = "default"
+    network = google_compute_network.vpc_network.name
     allow {
         protocol = "tcp"
         ports    = ["80", "443"]
